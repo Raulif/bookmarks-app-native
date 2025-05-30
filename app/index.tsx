@@ -1,4 +1,10 @@
-import { Text, View, StyleSheet, FlatList } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from '@expo-google-fonts/lora/useFonts';
 import {
@@ -14,24 +20,39 @@ import { Bookmark } from '@/types/bookmark';
 import { useSpeech } from '@/hooks/useSpeech';
 
 export default function App() {
-  useSpeech();
   let [fontsLoaded] = useFonts({
     Lora_400Regular,
     Lora_700Bold,
     Lora_400Regular_Italic,
   });
   const { bookmarks } = useBookmarks();
+  const { speak, stop, currentId, gettingText, isSpeaking, cancelGettingText } =
+    useSpeech();
   if (!fontsLoaded || !bookmarks?.length) {
     return null;
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.headline}>Bookmarked Articles</Text>
       <Text style={styles.counter}>[{bookmarks.length} links]</Text>
       <Text style={styles.read}>Consumed</Text>
+      <TouchableOpacity onPress={stop}>
+        <Text>Stop</Text>
+      </TouchableOpacity>
       <FlatList
         data={bookmarks}
-        renderItem={({ item }) => <ListItem {...item} />}
+        renderItem={({ item }) => (
+          <ListItem
+            {...item}
+            onHearPress={speak}
+            onStopPress={stop}
+            currentId={currentId}
+            playing={isSpeaking && currentId === item.id}
+            loading={gettingText && currentId === item.id}
+            onCancelPress={cancelGettingText}
+          />
+        )}
         keyExtractor={(item) => item.id}
       />
     </SafeAreaView>

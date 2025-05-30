@@ -1,3 +1,4 @@
+import { Bookmark } from '@/types/bookmark';
 export const formatDate = (date: number) =>
   new Date(date).toLocaleString('de', {
     year: 'numeric',
@@ -11,3 +12,6 @@ export const isHearable = (u: string) => {
   if (isGithubRepo) return false;
   return true;
 };
+
+export const sortBookmarksByDateAdded = (a: Bookmark, b: Bookmark) =>
+  a.dateAdded - b.dateAdded;

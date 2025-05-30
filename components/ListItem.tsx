@@ -1,9 +1,8 @@
-import { useSpeech } from '@/hooks/useSpeech';
 import { formatDate, isHearable } from '@/lib/helpers';
 import { Bookmark } from '@/types/bookmark';
 import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as Speech from 'expo-speech';
+import { HearButton } from './HearButton';
 
 type ListItemProps = {
   id: Bookmark['id'];
@@ -12,10 +11,13 @@ type ListItemProps = {
   url: Bookmark['url'];
   dateAdded: number;
   // onCheckboxChange: (id: Bookmark["id"], isChecked: boolean) => void;
-  // onHearClick: (id: Bookmark["id"]) => void;
+  onHearPress: (id: Bookmark['id']) => void;
   // number: number;
-  // onStop: () => void;
-  // onCancel: () => void;
+  onStopPress: () => void;
+  onCancelPress: () => void;
+  currentId: Bookmark['id'];
+  playing: boolean;
+  loading: boolean;
 };
 export const ListItem = ({
   id,
@@ -25,23 +27,30 @@ export const ListItem = ({
   // consumed,
   url,
   title,
-  // onHearClick,
-  // onStop,
-  // onCancel,
+  onHearPress,
+  currentId,
+  onStopPress,
+  loading,
+  onCancelPress,
+  playing,
 }: ListItemProps) => {
   const hearable = useMemo(() => isHearable(url), [url]);
   return (
     <View style={styles.container}>
       <Text>{formatDate(dateAdded)}</Text>
-      <Text style={styles.title}>{title}</Text>
+      <Text
+        style={{ ...styles.title, ...(currentId === id ? styles.active : {}) }}
+      >
+        {title}
+      </Text>
       {hearable ? (
-        <TouchableOpacity
-          onPress={(e) => {
-            Speech.speak(`WebView with some things written in native is probably the most pragmatic way to get it done. If there is a feature that requires native functionality just write that part in native the rest reuse the site and make some changes to integrate the two.`)
-          }}
-        >
-          <Text>Hear</Text>
-        </TouchableOpacity>
+        <HearButton
+          playing={playing}
+          loading={loading}
+          onHearPress={() => onHearPress(id)}
+          onStopPress={onStopPress}
+          onCancelPress={onCancelPress}
+        />
       ) : null}
     </View>
   );
@@ -55,5 +64,10 @@ const styles = StyleSheet.create({
   },
   container: {
     marginBottom: 16,
+  },
+  active: {
+    color: 'blueviolet',
+    fontFamily: 'Lora_700Bold',
+    fontWeight: 700,
   },
 });
