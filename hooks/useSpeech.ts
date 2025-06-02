@@ -79,7 +79,7 @@ export const useSpeech = () => {
   }, [speech]);
 
   const cancelGettingText = useCallback(async () => {
-    abortController?.abort('cancel fetching');
+    abortController?.abort('Cancel fetching article with Abort Controller.');
     setGettingText(false);
     setAbortController(new AbortController());
     currentId.current = '';

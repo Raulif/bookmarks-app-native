@@ -1,0 +1,26 @@
+{
+  "build": {
+    "base": {
+      "android": {
+        "image": "auto",
+        "env": {
+          "PLATFORM": "android"
+        }
+      }
+    },
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "android": {
+        "distribution": "internal",
+        "withoutCredentials": true
+      }
+    },
+    "production": {
+      "extends": "base",
+      "env": {
+        "ENVIRONMENT": "production"
+      }
+    }
+  }
+}
