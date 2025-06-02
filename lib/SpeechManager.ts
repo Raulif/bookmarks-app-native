@@ -1,6 +1,5 @@
 import * as Speech from 'expo-speech';
 
-// Types and interfaces
 interface SpeechManagerOptions {
   onPlay?: () => void;
   onStop?: () => void;

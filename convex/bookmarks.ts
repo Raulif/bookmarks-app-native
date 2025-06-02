@@ -8,6 +8,7 @@ const Bookmark = v.object({
   dateAdded: v.number(),
   consumed: v.boolean(),
   createdAt: v.number(),
+  hearable: v.boolean()
 });
 export const post = mutation({
   handler: async (ctx, args) => {

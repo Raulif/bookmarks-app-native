@@ -1,26 +1,30 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+type HearButtonProps = {
+  playing: boolean;
+  loading: boolean;
+  onCancelPress: () => void;
+  onStopPress: () => void;
+  onHearPress: () => void;
+};
+
 export const HearButton = ({
   playing,
   loading,
   onCancelPress,
   onStopPress,
   onHearPress,
-}: {
-  playing: boolean;
-  loading: boolean;
-  onCancelPress: () => void;
-  onStopPress: () => void;
-  onHearPress: () => void;
-}) => {
+}: HearButtonProps) => {
   if (loading) {
     return (
       <View style={styles.container}>
         <TouchableOpacity
-          style={{ ...styles.button, ...styles.cancelButon }}
+          style={StyleSheet.compose(styles.button, styles.cancelButon)}
           onPress={onCancelPress}
         >
-          <Text style={{ ...styles.buttonText, ...styles.cancelText }}>
+          <Text
+            style={StyleSheet.compose(styles.buttonText, styles.cancelText)}
+          >
             Cancel
           </Text>
         </TouchableOpacity>
@@ -30,23 +34,29 @@ export const HearButton = ({
   }
   if (playing) {
     return (
-      <TouchableOpacity
-        style={{ ...styles.button, ...styles.playingButton }}
-        onPress={onStopPress}
-      >
-        <Text style={{ ...styles.buttonText, ...styles.playingText }}>
-          Stop
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={StyleSheet.compose(styles.button, styles.playingButton)}
+          onPress={onStopPress}
+        >
+          <Text
+            style={StyleSheet.compose(styles.buttonText, styles.playingText)}
+          >
+            Stop
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   }
   return (
-    <TouchableOpacity
-      style={{ ...styles.button }}
-      onPress={onHearPress}
-    >
-      <Text style={{ ...styles.buttonText }}>Hear</Text>
-    </TouchableOpacity>
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={onHearPress}
+      >
+        <Text style={styles.buttonText}>Hear</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -54,32 +64,35 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     gap: 8,
+    flexDirection: 'row',
+    marginTop: 8,
   },
   button: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 2,
     borderColor: 'blueviolet',
     borderWidth: 1,
     alignSelf: 'flex-start',
-    marginTop: 8,
     minWidth: 68,
     alignItems: 'center',
     gap: 8,
     borderRadius: 4,
   },
   buttonText: {
+    fontFamily: 'Lora_400Regular',
     fontSize: 14,
-    fontWeight: 700,
     color: 'blueviolet',
   },
   playingButton: {
     backgroundColor: 'black',
+    borderColor: 'white',
   },
   playingText: {
     color: 'white',
   },
   cancelButon: {
     backgroundColor: 'black',
+    borderColor: 'black',
   },
   cancelText: {
     color: 'white',

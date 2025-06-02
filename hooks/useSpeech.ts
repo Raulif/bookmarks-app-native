@@ -8,14 +8,13 @@ export const useSpeech = () => {
   const { bookmarks } = useBookmarks();
   const [speech, setSpeech] = useState<SpeechManager | null>(null);
   const currentId = useRef('');
-  const [gettingText, setGettingText] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
 
   const playNextItem = useCallback(() => {
     if (!currentId.current || !bookmarks.length) return;
-    console.log('play next item', currentId.current);
     const currentIndex = bookmarks.findIndex(
       (bm) => bm.id === currentId.current
     );
@@ -37,30 +36,28 @@ export const useSpeech = () => {
   const getArticleText = async (id: string) => {
     const url = bookmarks.find((bm) => bm.id === id)?.url;
     if (!url) {
-      setGettingText(false);
       throw Error('No url found to play');
     }
     const text = await getArticle(url, abortController?.signal as AbortSignal);
     if (!text) {
       throw Error('No article text found');
     }
-    setGettingText(false);
     return text;
   };
 
   const speak = useCallback(
     async (id: string) => {
+      setLoading(true);
       setAbortController(new AbortController());
-      setGettingText(true);
       currentId.current = id;
       try {
         const text = await getArticleText(id);
-
         speech?.speak(text);
+        setLoading(false)
       } catch (e) {
         console.error('Error on hear click: ', e);
         currentId.current = '';
-        setGettingText(false);
+        setLoading(false);
       }
     },
     [bookmarks, currentId.current]
@@ -68,7 +65,8 @@ export const useSpeech = () => {
 
   const stop = useCallback(() => {
     speech?.stop();
-  }, [speech]);
+    currentId.current = '';
+  }, [speech, currentId.current]);
 
   const pause = useCallback(() => {
     speech?.pause();
@@ -78,9 +76,9 @@ export const useSpeech = () => {
     speech?.resume();
   }, [speech]);
 
-  const cancelGettingText = useCallback(async () => {
+  const abortLoading = useCallback(async () => {
     abortController?.abort('Cancel fetching article with Abort Controller.');
-    setGettingText(false);
+    setLoading(false);
     setAbortController(new AbortController());
     currentId.current = '';
     if (await speech?.isSpeaking()) {
@@ -91,12 +89,12 @@ export const useSpeech = () => {
 
   return {
     speak,
-    gettingText,
+    loading,
     isSpeaking,
     stop,
     pause,
     resume,
     currentId: currentId.current,
-    cancelGettingText,
+    abortLoading,
   };
 };

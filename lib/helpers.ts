@@ -13,5 +13,9 @@ export const isHearable = (u: string) => {
   return true;
 };
 
-export const sortBookmarksByDateAdded = (a: Bookmark, b: Bookmark) =>
+export const sortByDateAdded = (a: Bookmark, b: Bookmark) =>
   a.dateAdded - b.dateAdded;
+
+export const sortByConsumed = (a: Bookmark, b: Bookmark) => 
+  a.consumed ? 1 : b.consumed ? -1 : 0;
+;
