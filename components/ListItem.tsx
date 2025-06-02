@@ -39,7 +39,10 @@ export const ListItem = ({
     <View style={styles.container}>
       <Text>{formatDate(dateAdded)}</Text>
       <Text
-        style={{ ...styles.title, ...(currentId === id ? styles.active : {}) }}
+        style={StyleSheet.compose(
+          styles.title,
+          currentId === id ? styles.active : {}
+        )}
       >
         {title}
       </Text>
