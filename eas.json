@@ -25,7 +25,11 @@
       "env": {
         "ENVIRONMENT": "production"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "distribution": "internal",
+        "withoutCredentials": true
+      }
     }
   }
 }
