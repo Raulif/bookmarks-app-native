@@ -4,9 +4,8 @@ export const getArticle = async (
 ): Promise<string> => {
   try {
     const urlParams = new URLSearchParams({ url });
-    const articleApiUrl = `${process.env.EXPO_PUBLIC_BOOKMARKS_BACKEND_URL}/api/article`;
-    const targetUrl = `${articleApiUrl}?${urlParams.toString()}`;
-    const response = await fetch(`${articleApiUrl}?${urlParams.toString()}`, {
+    const apiUrl = `${process.env.EXPO_PUBLIC_BOOKMARKS_BACKEND_URL}/api/article`;
+    const response = await fetch(`${apiUrl}?${urlParams.toString()}`, {
       signal,
     });
     const { text } = await response.json();

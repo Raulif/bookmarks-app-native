@@ -6,86 +6,88 @@ import { Bookmark } from '@/types/bookmark';
 
 export const useSpeech = () => {
   const { bookmarks } = useBookmarks();
-  const [speech, setSpeech] = useState<SpeechManager | null>(null);
+  const speech = useRef<SpeechManager | null>(null);
   const currentId = useRef('');
   const [loading, setLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
 
-  const playNextItem = useCallback(() => {
-    if (!currentId.current || !bookmarks.length) return;
-    const currentIndex = bookmarks.findIndex(
-      (bm) => bm.id === currentId.current
-    );
-    const nextBookmark = bookmarks.at(currentIndex + 1) as Bookmark;
-    speak(nextBookmark.id);
-  }, [currentId.current, bookmarks]);
-
-  useEffect(() => {
-    if (!speech) {
-      const speechManager = new SpeechManager({
-        onEnd: playNextItem,
-        onPlay: () => setIsSpeaking(true),
-        onStop: () => setIsSpeaking(false),
-      });
-      setSpeech(speechManager);
-    }
-  }, [SpeechManager, speech]);
-
   const getArticleText = async (id: string) => {
     const url = bookmarks.find((bm) => bm.id === id)?.url;
     if (!url) {
-      throw Error('No url found to play');
+      console.error('No url found to play');
+      stop();
+      return null;
     }
     const text = await getArticle(url, abortController?.signal as AbortSignal);
     if (!text) {
-      throw Error('No article text found');
+      console.error('No article text found');
+      stop();
+      return null;
     }
     return text;
   };
 
-  const speak = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      setAbortController(new AbortController());
-      currentId.current = id;
-      try {
-        const text = await getArticleText(id);
-        speech?.speak(text);
-        setLoading(false)
-      } catch (e) {
-        console.error('Error on hear click: ', e);
-        currentId.current = '';
-        setLoading(false);
-      }
-    },
-    [bookmarks, currentId.current]
-  );
+  const speak = async (id: string) => {
+    setLoading(true);
+    setAbortController(new AbortController());
+    currentId.current = id;
+    try {
+      const text = await getArticleText(id);
+      if (!text) return;
+      speech.current?.speak(text);
+      setLoading(false);
+    } catch (e) {
+      console.error('Error on hear click: ', e);
+      currentId.current = '';
+      setLoading(false);
+    }
+  };
 
-  const stop = useCallback(() => {
-    speech?.stop();
+  const stop = () => {
+    speech.current?.stop();
     currentId.current = '';
-  }, [speech, currentId.current]);
+  };
 
-  const pause = useCallback(() => {
-    speech?.pause();
-  }, [speech]);
+  const pause = () => {
+    speech.current?.pause();
+  };
 
-  const resume = useCallback(() => {
-    speech?.resume();
-  }, [speech]);
+  const resume = () => {
+    speech.current?.resume();
+  };
 
   const abortLoading = useCallback(async () => {
     abortController?.abort('Cancel fetching article with Abort Controller.');
     setLoading(false);
     setAbortController(new AbortController());
     currentId.current = '';
-    if (await speech?.isSpeaking()) {
-      speech?.stop();
+    if (await speech.current?.isSpeaking()) {
+      speech.current?.stop();
       setIsSpeaking(false);
     }
-  }, [abortController, speech]);
+  }, [abortController]);
+
+  const playNextItem = useCallback(() => {
+    if (!currentId.current || !bookmarks?.length) return;
+    const currentIndex = bookmarks.findIndex(
+      (bm) => bm.id === currentId.current
+    );
+    const nextBookmark = bookmarks.at(currentIndex + 1) as Bookmark;
+    speak(nextBookmark.id);
+  }, [currentId.current, bookmarks, speak]);
+
+  useEffect(() => {
+    if (!speech?.current && !!bookmarks?.length) {
+      const speechManager = new SpeechManager({
+        onEnd: playNextItem,
+        onPlay: () => setIsSpeaking(true),
+        onStop: () => setIsSpeaking(false),
+      });
+      speech.current = speechManager;
+    }
+  }, [SpeechManager, speech.current, playNextItem, bookmarks]);
 
   return {
     speak,

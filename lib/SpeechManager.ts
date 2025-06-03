@@ -15,27 +15,28 @@ export class SpeechManager {
   private currentChunk: number;
   private bugFixInterval: number;
   private chunkSize: number;
+  private onEndCallback: () => void;
 
   constructor(options: SpeechManagerOptions = {}) {
     // Default options
-    this.options = this._prepareOptions(options);
+    this.chunks = [];
     this.chunkSize = Speech.maxSpeechInputLength;
     this.synth = Speech;
-    this.chunks = [];
     this.currentChunk = 0;
     this.bugFixInterval = 0;
+    this.options = this._prepareOptions(options);
+    this.onEndCallback = options.onEnd || (() => null);
   }
 
   private _prepareOptions(options: SpeechManagerOptions) {
-    const that = this;
     return {
       onStart: options?.onPlay,
       onStopped: () => {
         options.onStop && options?.onStop();
-        that._clearBugFixInterval();
+        this._clearBugFixInterval();
       },
-      onDone: this._handleChunkEnd,
-      onError: this._handleError,
+      onDone: () => this._handleChunkEnd(),
+      onError: (e: Error) => this._handleError(e),
       onPause: options?.onPause,
       onResume: options?.onResume,
       voice: 'en-US-language',
@@ -46,7 +47,6 @@ export class SpeechManager {
   // Split text into manageable chunks
   private _prepareChunks(text: string): number {
     const { chunkSize } = this;
-
     // Clear existing chunks
     this.chunks = [];
     this.currentChunk = 0;
@@ -65,7 +65,6 @@ export class SpeechManager {
         this.chunks.push(currentChunk);
         currentChunk = '';
       }
-
       // If a single sentence exceeds chunk size, split it further
       if (sentence.length > chunkSize) {
         // If we have content in current chunk, push it first
@@ -93,12 +92,10 @@ export class SpeechManager {
         currentChunk += (currentChunk ? ' ' : '') + sentence;
       }
     });
-
     // Don't forget the last chunk
     if (currentChunk.length > 0) {
       this.chunks.push(currentChunk);
     }
-
     return this.chunks.length;
   }
 
@@ -112,6 +109,8 @@ export class SpeechManager {
     if (this.currentChunk < this.chunks.length - 1) {
       this.currentChunk++;
       this._speakCurrentChunk();
+    } else {
+      this.onEndCallback();
     }
   }
 
