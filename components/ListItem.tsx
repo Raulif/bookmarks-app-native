@@ -1,4 +1,4 @@
-import { formatDate, isHearable } from '@/lib/helpers';
+import { formatDate } from '@/lib/helpers';
 import { Bookmark } from '@/types/bookmark';
 import { memo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
