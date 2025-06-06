@@ -1,6 +1,6 @@
-export const getArticle = async (
+export const fetchArticle = async (
   url: string,
-  signal: AbortSignal
+  signal?: AbortSignal
 ): Promise<string> => {
   try {
     const urlParams = new URLSearchParams({ url });

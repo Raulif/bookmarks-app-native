@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from '@expo-google-fonts/lora/useFonts';
@@ -15,6 +16,12 @@ import {
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { ListItem } from '@/components/ListItem';
 import { useSpeech } from '@/hooks/useSpeech';
+import { useCallback } from 'react';
+import { Bookmark } from '@/types/bookmark';
+import { Drawer } from '@/components/Drawer';
+import playerStore from '@/store/playerStateStore';
+import { PlayerButton } from '@/components/PlayButton';
+import { useStore } from 'zustand';
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -23,14 +30,19 @@ export default function App() {
     Lora_400Regular_Italic,
   });
   const { bookmarks, updateBookmark } = useBookmarks();
-  const {
-    speak,
-    stop,
-    currentId,
-    loading: gettingText,
-    isSpeaking,
-    abortLoading: cancelGettingText,
-  } = useSpeech();
+  const { stop, cancel, getArticle } = useSpeech();
+  const playerState = useStore(playerStore, (state) => state);
+
+  const onToggleConsumed = useCallback(
+    (id: Bookmark['id'], consumed: boolean) => {
+      if (playerState.currentId === id) {
+        stop();
+      }
+      updateBookmark(id, consumed);
+    },
+    [playerState.currentId]
+  );
+
   if (!fontsLoaded || !bookmarks?.length) {
     return null;
   }
@@ -40,8 +52,9 @@ export default function App() {
       <View style={styles.headlineContainer}>
         <Text style={styles.headline}>Bookmarked Articles</Text>
         <TouchableOpacity
-          onPress={stop}
+          onPress={cancel}
           style={styles.stop}
+          className='cancel-button'
         >
           <Text style={styles.stopText}>Stop</Text>
         </TouchableOpacity>
@@ -54,16 +67,38 @@ export default function App() {
         renderItem={({ item }) => (
           <ListItem
             {...item}
-            onHearPress={speak}
-            onStopPress={stop}
-            playing={isSpeaking && currentId === item.id}
-            loading={gettingText && currentId === item.id}
-            onCancelPress={cancelGettingText}
-            onCheckboxChange={updateBookmark}
-          />
+            isPlaying={
+              playerState.currentId === item.id && playerState.isPlaying
+            }
+            onToggleConsumed={onToggleConsumed}
+          >
+            {item.hearable && (
+              <View style={[item.consumed ? styles.consumed : {}]}>
+                <PlayerButton
+                  onPlayPress={() => getArticle(item.id, item.title)}
+                  onCancelPress={cancel}
+                  onStopPress={stop}
+                  isListItem={true}
+                  isPlaying={
+                    playerState.currentId === item.id && playerState.isPlaying
+                  }
+                  isLoading={
+                    playerState.loadingId === item.id && playerState.isLoading
+                  }
+                />
+              </View>
+            )}
+          </ListItem>
         )}
         keyExtractor={(item) => item.id}
       />
+      <Drawer>
+        <PlayerButton
+          isPlaying={true}
+          onStopPress={stop}
+          isListItem={false}
+        />
+      </Drawer>
     </SafeAreaView>
   );
 }
@@ -71,6 +106,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative',
   },
   headlineContainer: {
     alignItems: 'center',
@@ -111,5 +147,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Lora_700Bold',
     fontSize: 18,
     textAlign: 'center',
+  },
+  consumed: {
+    opacity: 0.3,
   },
 });
