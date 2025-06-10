@@ -36,8 +36,7 @@
         "withoutCredentials": true
       },
       "ios": {
-        "distribution": "internal",
-        "withoutCredentials": true
+        "distribution": "internal"
       }
     }
   }

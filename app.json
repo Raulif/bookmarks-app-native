@@ -21,7 +21,6 @@
       "edgeToEdgeEnabled": true,
       "package": "com.raulif.bookmarksappnative"
     },
-
     "web": {
       "bundler": "metro",
       "output": "static",
