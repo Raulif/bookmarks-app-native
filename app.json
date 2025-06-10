@@ -9,7 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bookmarksappnative.app",
+      "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +21,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.raulif.bookmarksappnative"
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
