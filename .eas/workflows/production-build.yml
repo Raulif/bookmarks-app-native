@@ -37,4 +37,4 @@ jobs:
     type: build # This job type creates a production build for iOS
     params:
       platform: ios
-      profile: production
+      profile: development
