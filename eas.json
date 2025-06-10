@@ -1,6 +1,6 @@
 {
   "cli": {
-    "appVersionSource": "remote",
+    "appVersionSource": "remote"
   },
   "build": {
     "base": {
@@ -8,6 +8,12 @@
         "image": "auto",
         "env": {
           "PLATFORM": "android"
+        }
+      },
+      "ios": {
+        "image": "auto",
+        "env": {
+          "PLATFORM": "ios"
         }
       }
     },
@@ -26,6 +32,10 @@
       },
       "autoIncrement": true,
       "android": {
+        "distribution": "internal",
+        "withoutCredentials": true
+      },
+      "ios": {
         "distribution": "internal",
         "withoutCredentials": true
       }
