@@ -23,6 +23,10 @@
       "android": {
         "distribution": "internal",
         "withoutCredentials": true
+      },
+      "ios": {
+        "distribution": "internal",
+        "withoutCredentials": true
       }
     },
     "production": {
