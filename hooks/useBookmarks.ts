@@ -31,7 +31,7 @@ export const useBookmarks = (): ReturnUseBookmarks => {
 		if (data?._id && !collectionId) {
 			setCollectionId(data._id);
 		}
-	}, [data]);
+	}, [data, collectionId]);
 
 	const updateBookmark = useCallback(
 		async (id: string, consumed: boolean) => {
@@ -47,7 +47,7 @@ export const useBookmarks = (): ReturnUseBookmarks => {
 				});
 			}
 		},
-		[data, collectionId],
+		[data, collectionId, updateBookmarks],
 	);
 
 	return {

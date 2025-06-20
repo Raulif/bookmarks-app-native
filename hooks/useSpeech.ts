@@ -17,13 +17,12 @@ export const useSpeech = () => {
 		if (speech.current?.stop) {
 			speech.current?.stop();
 		}
-	}, [speech.current]);
+	}, []);
 
 	const getArticle = useCallback(
 		async (id: string, title: string) => {
-			const isPlaying = await speech.current?.isSpeaking();
-			console.log({ isPlaying });
-			if (isPlaying) {
+			const isSpeaking = await speech.current?.isSpeaking();
+			if (isSpeaking) {
 				speech.current?.stop();
 				speech.current = null;
 			}
@@ -66,7 +65,7 @@ export const useSpeech = () => {
 		if (await speech.current?.isSpeaking()) {
 			stop();
 		}
-	}, [abortController, speech.current, playerState, stop]);
+	}, [abortController, playerState, stop]);
 
 	const playNext = useCallback(() => {
 		if (!playerState.currentId || !bookmarks?.length) return;
@@ -75,7 +74,7 @@ export const useSpeech = () => {
 		);
 		const nextBookmark = bookmarks.at(currentIndex + 1) as Bookmark;
 		getArticle(nextBookmark.id, nextBookmark.title);
-	}, [playerState.currentId, bookmarks, fetchArticle]);
+	}, [playerState.currentId, bookmarks, getArticle]);
 
 	const onPlayCallback = useCallback(() => {
 		playerState.onPlay();
@@ -96,14 +95,14 @@ export const useSpeech = () => {
 		});
 		speech.current = speechManager;
 		return speechManager;
-	}, [playNext, onPlayCallback, onStopCallback, SpeechManager]);
+	}, [playNext, onPlayCallback, onStopCallback]);
 
 	useEffect(() => {
 		if (playerState.text && !playerState.isPlaying) {
 			const speech = createSpeechManager();
 			speech.speak(playerState.text);
 		}
-	}, [speech.current, playerState.isPlaying, playerState.text]);
+	}, [playerState.isPlaying, playerState.text, createSpeechManager]);
 
 	return {
 		getArticle,

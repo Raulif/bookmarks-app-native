@@ -40,7 +40,7 @@ export default function App() {
 			}
 			updateBookmark(id, consumed);
 		},
-		[playerState.currentId],
+		[playerState.currentId, stop, updateBookmark],
 	);
 
 	if (!fontsLoaded || !bookmarks?.length) {

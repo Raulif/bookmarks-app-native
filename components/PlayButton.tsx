@@ -30,7 +30,7 @@ export const PlayerButton = ({
 		} else {
 			onPlayPress && onPlayPress();
 		}
-	}, [isPlaying, isLoading, onCancelPress]);
+	}, [isPlaying, isLoading, onCancelPress, onPlayPress, onStopPress]);
 
 	return (
 		<TouchableOpacity
