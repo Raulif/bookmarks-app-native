@@ -3,6 +3,8 @@ name: Production Build
 on:
   push:
     branches: ['main']
+  pull_request:
+    branches: ['main']
 
 jobs:
   fingerprint:
@@ -15,13 +17,6 @@ jobs:
     params:
       fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
       profile: production
-  get_ios_build:
-    name: Check for existing ios build
-    needs: [fingerprint]
-    type: get-build
-    params:
-      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
-      profile: production
   build_android:
     name: Build Android
     needs: [get_android_build]
@@ -30,11 +25,3 @@ jobs:
     params:
       platform: android
       profile: production
-  build_ios:
-    name: Build iOS
-    needs: [get_ios_build]
-    if: ${{ !needs.get_ios_build.outputs.build_id }}
-    type: build # This job type creates a production build for iOS
-    params:
-      platform: ios
-      profile: development
