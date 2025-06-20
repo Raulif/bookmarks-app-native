@@ -1,1 +1,1 @@
-declare module 'jsdom-jscore-rn'
+declare module 'jsdom-jscore-rn';
